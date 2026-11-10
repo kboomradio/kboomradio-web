@@ -86,7 +86,32 @@
     <audio id="audio-player" preload="none">
     <source src="https://custom-azura1.asurahosting.com/listen/k-boomradio.com/radio.mp3" type="audio/mpeg">
 </audio>
+<script>
+  const player = document.getElementById('audio-player');
+  let reconnectTimeout;
 
+  // Si el reproductor detecta un error de red
+  player.addEventListener('error', function() {
+    intentarReconexion();
+  });
+
+  // Si la emisión se congela por falta de datos
+  player.addEventListener('stalled', function() {
+    intentarReconexion();
+  });
+
+  function intentarReconexion() {
+    console.log("Conexión perdida. Intentando reconectar la radio...");
+    clearTimeout(reconnectTimeout);
+    
+    reconnectTimeout = setTimeout(() => {
+      const baseUrl = "https://custom-azura1.asurahosting.com/listen/k-boomradio.com/radio.mp3";
+      player.src = baseUrl + "?t=" + new Date().getTime();
+      player.load();
+      player.play().catch(e => console.log("Esperando interacción para reproducir..."));
+    }, 3000); // Espera 3 segundos a que se estabilice el cambio de red
+  }
+</script>
     <script>
         const playBtn = document.getElementById('play-btn');
         const playIcon = document.getElementById('play-icon');
